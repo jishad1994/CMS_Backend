@@ -9,6 +9,7 @@ const requiredVariables = [
     "JWT_REFRESH_TOKEN_EXPIRES_IN",
     "JWT_ACCESS_TOKEN_EXPIRES_IN",
     "CLIENT_URL",
+    "NODE_ENV"
 ] as const;
 
 requiredVariables.forEach((key) => {
@@ -26,4 +27,5 @@ export const env = {
     jwtRefreshTokenExpiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES_IN as string,
     clientUrl: process.env.CLIENT_URL as string,
     redisUrl: process.env.REDIS_URL as string,
+   
 };

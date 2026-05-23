@@ -1,13 +1,15 @@
 import { ERROR_MESSAGES } from "../../constants/erro.messages.constants";
+import { HTTP_MESSAGES } from "../../constants/http.messages.contants";
 import { LoginDto, RegisterDto } from "../../dtos/auth.dto";
 import { AppError } from "../../errors/app.error";
+import { ICacheService } from "../../infrastructure/cacheService/ICacheService";
 import { IUserRepository } from "../../repositories/interfaces/user.repository.interface";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.util";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.util";
 import { comparePassword, hashPassword } from "../../utils/password.util";
 import { IAuthService } from "./auth.service.interface";
 
 export class AuthService implements IAuthService {
-    constructor(private readonly userRepository: IUserRepository) {}
+    constructor(private readonly userRepository: IUserRepository, private readonly cacheService: ICacheService) {}
 
     async register(dto: RegisterDto) {
         const existingUser = await this.userRepository.findByEmail(dto.email);
@@ -26,12 +28,23 @@ export class AuthService implements IAuthService {
 
         const accessToken = generateAccessToken({
             userId: user._id.toString(),
+            name: user.name,
             email: user.email,
         });
+
+        //Generate new  session ID
+        const sessionId = crypto.randomUUID();
+
         const refreshToken = generateRefreshToken({
             userId: user._id.toString(),
+            name: user.name,
             email: user.email,
+            sessionId,
         });
+
+        const refreshTokenExpiryInSeconds = 7 * 24 * 60 * 60;
+
+        await this.cacheService.set(sessionId, refreshToken, refreshTokenExpiryInSeconds);
 
         return {
             user: {
@@ -59,12 +72,30 @@ export class AuthService implements IAuthService {
 
         const accessToken = generateAccessToken({
             userId: user._id.toString(),
+            name: user.name,
             email: user.email,
         });
+
+        //Generate new  session ID
+        const sessionId = crypto.randomUUID();
+
         const refreshToken = generateRefreshToken({
             userId: user._id.toString(),
+            name: user.name,
             email: user.email,
+            sessionId,
         });
+        const refreshTokenExpiryInSeconds = 7 * 24 * 60 * 60;
+
+        await this.cacheService.set(
+            sessionId,
+            {
+                userId: user._id.toString(),
+                email: user.email,
+                sessionId,
+            },
+            refreshTokenExpiryInSeconds,
+        );
 
         return {
             user: {
@@ -74,6 +105,55 @@ export class AuthService implements IAuthService {
             },
             accessToken,
             refreshToken,
+        };
+    }
+
+    async refresh(oldRefreshToken: string) {
+        const payload = verifyRefreshToken(oldRefreshToken);
+
+        const oldSession = await this.cacheService.get(payload.sessionId);
+
+        if (!oldSession) {
+            throw new AppError(HTTP_MESSAGES.INVALID_SESSION_DATA, 401);
+        }
+
+        await this.cacheService.delete(payload.sessionId);
+
+        const newSessionId = crypto.randomUUID();
+
+        const newAccessToken = generateAccessToken({
+            userId: payload.userId,
+            name: payload.name,
+            email: payload.email,
+        });
+
+        const newRefreshToken = generateRefreshToken({
+            userId: payload.userId,
+            name: payload.name,
+            email: payload.email,
+            sessionId: newSessionId,
+        });
+
+        const refreshTokenExpiryInSeconds = 7 * 24 * 60 * 60;
+
+        await this.cacheService.set(
+            newSessionId,
+            {
+                userId: payload.userId,
+                email: payload.email,
+                sessionId: newSessionId,
+            },
+            refreshTokenExpiryInSeconds,
+        );
+
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            user: {
+                id: payload.userId,
+                name: payload.name,
+                email: payload.email,
+            },
         };
     }
 }
