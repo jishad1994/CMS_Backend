@@ -1,9 +1,8 @@
-import type { HydratedDocument } from "mongoose";
 import type { ArticleDocument } from "../models/article.model.js";
 import type { ArticleResponseDto } from "../dtos/article.dto.js";
 
 export const mapArticleToResponseDto = (
-  article: HydratedDocument<ArticleDocument>,
+  article: ArticleDocument,
 ): ArticleResponseDto => {
   return {
     id: article._id.toString(),
@@ -19,7 +18,7 @@ export const mapArticleToResponseDto = (
 };
 
 export const mapArticlesArrayToResponseDto = (
-  articles: HydratedDocument<ArticleDocument>[],
+  articles: ArticleDocument[],
 ): ArticleResponseDto[] => {
   return articles.map(mapArticleToResponseDto);
 };

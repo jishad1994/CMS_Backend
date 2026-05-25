@@ -1,13 +1,22 @@
-import { Schema, model, InferSchemaType, } from "mongoose";
+import { Schema, model } from "mongoose";
+import type { HydratedDocument } from "mongoose";
 
-const userSchema = new Schema(
+export interface User {
+  name: string;
+  email: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema<User>(
   {
     name: {
       type: String,
       required: [true, "Name is required"],
       trim: true,
       minlength: 2,
-      maxlength: 80
+      maxlength: 80,
     },
 
     email: {
@@ -15,19 +24,20 @@ const userSchema = new Schema(
       required: [true, "Email is required"],
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
     },
 
     password: {
       type: String,
       required: [true, "Password is required"],
-      select: false
-    }
+      select: false,
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
-export type UserDocument = InferSchemaType<typeof userSchema>;
-export const UserModel = model("User", userSchema);
+export type UserDocument = HydratedDocument<User>;
+
+export const UserModel = model<User>("User", userSchema);

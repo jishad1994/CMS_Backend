@@ -44,7 +44,16 @@ export class AuthService implements IAuthService {
 
         const refreshTokenExpiryInSeconds = 7 * 24 * 60 * 60;
 
-        await this.cacheService.set(sessionId, refreshToken, refreshTokenExpiryInSeconds);
+        await this.cacheService.set(
+            sessionId,
+            {
+                userId: user._id.toString(),
+                email: user.email,
+                sessionId,
+                createdAt: new Date().toISOString(),
+            },
+            refreshTokenExpiryInSeconds,
+        );
 
         return {
             user: {
@@ -93,6 +102,7 @@ export class AuthService implements IAuthService {
                 userId: user._id.toString(),
                 email: user.email,
                 sessionId,
+                createdAt: new Date().toISOString(),
             },
             refreshTokenExpiryInSeconds,
         );
@@ -142,6 +152,7 @@ export class AuthService implements IAuthService {
                 userId: payload.userId,
                 email: payload.email,
                 sessionId: newSessionId,
+                createdAt: new Date().toISOString(),
             },
             refreshTokenExpiryInSeconds,
         );

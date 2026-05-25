@@ -50,4 +50,5 @@ export const HTTP_MESSAGES = {
 
     SERVER_ERROR: "Internal server error",
     SERVICE_UNAVAILABLE: "Service temporarily unavailable",
+    DATA_FETCH_SUCCESSFULL: "Data fetch successfull",
 } as const;

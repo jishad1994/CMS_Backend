@@ -20,13 +20,16 @@ export const loginSchema = z.object({
 
 //  regex for JWT structure (header.payload.signature)
 const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+
 export const AuthCookiesSchema = z.object({
     accessToken: z.string().regex(jwtRegex, "Invalid token format"),
     refreshToken: z.string().regex(jwtRegex, "Invalid token format"),
 });
 
 export type RegisterDto = z.infer<typeof registerSchema>["body"];
+
 export type LoginDto = z.infer<typeof loginSchema>["body"];
+
 
 export interface AuthUserResponseDto {
     id: string;

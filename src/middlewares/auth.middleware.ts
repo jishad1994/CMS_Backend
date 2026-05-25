@@ -17,7 +17,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
     try {
         const payload: JwtPayload = verifyAccessToken(accessToken);
 
-        req.user = { userId: payload.userId, email: payload.email };
+        req.user = { userId: payload.userId,name:payload.name, email: payload.email };
         next();
     } catch (error) {
         logger.error("Unexpected Auth Error:", error);

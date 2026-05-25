@@ -1,13 +1,14 @@
-import { HydratedDocument, Model } from "mongoose";
-import { BaseRepository } from "./base.repository";
-import { UserDocument } from "../../models/user.model";
-import { IUserRepository } from "../interfaces/user.repository.interface";
+import type { Model } from "mongoose";
+import { BaseRepository } from "./base.repository.js";
+import type { User, UserDocument } from "../../models/user.model.js";
+import type { IUserRepository } from "../interfaces/user.repository.interface.js";
 
-export class UserRepository extends BaseRepository<HydratedDocument<UserDocument>> implements IUserRepository {
-    constructor(model: Model<HydratedDocument<UserDocument>>) {
+export class UserRepository extends BaseRepository<User> implements IUserRepository {
+    constructor(model: Model<User>) {
         super(model);
     }
-    async findByEmail(email: string, includePassword = false): Promise<HydratedDocument<UserDocument> | null> {
+
+    async findByEmail(email: string, includePassword = false): Promise<UserDocument | null> {
         const query = this.model.findOne({ email });
 
         if (includePassword) {
