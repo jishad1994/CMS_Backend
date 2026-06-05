@@ -13,7 +13,7 @@ export const articleRepository = new ArticleRepository(ArticleModel);
 export const articleService = new ArticleService(articleRepository);
 export const articleController = new ArticleController(articleService);
 
-const cacheService = new RedisCacheService(env.redisUrl);
+export const cacheService = new RedisCacheService(env.redisUrl);
 
 export const userRepository = new UserRepository(UserModel);
 export const authService = new AuthService(userRepository, cacheService);

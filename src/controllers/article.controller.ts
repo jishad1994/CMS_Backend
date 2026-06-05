@@ -21,40 +21,60 @@ export class ArticleController {
         }
     };
 
-    getPublishedArticles = async (req: Request, res: Response): Promise<void> => {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
+    getPublishedArticles = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
 
-        const articles = await this.articleService.getPublishedArticles(page, limit);
+            const { articles, paginationMeta } = await this.articleService.getPublishedArticles(page, limit);
 
-        res.status(200).json({
-            success: true,
-            data: articles,
-        });
+            return ApiResponse.success(res, HTTP_MESSAGES.DATA_FETCH_SUCCESSFULL, articles, 200, paginationMeta);
+        } catch (error) {
+            next(error);
+        }
     };
 
-    getArticleBySlug = async (req: Request, res: Response): Promise<void> => {
-        const { slug } = req.params;
+    getArticleBySlug = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+        try {
+            const { slug } = req.params;
 
-        if (!slug || typeof slug !== "string") {
-            throw new AppError(HTTP_MESSAGES.VALIDATION_ERROR, 400);
+            if (!slug || typeof slug !== "string") {
+                throw new AppError(HTTP_MESSAGES.VALIDATION_ERROR, 400);
+            }
+
+            const article = await this.articleService.getArticleBySlug(slug);
+
+            return ApiResponse.success(res, HTTP_MESSAGES.DATA_FETCH_SUCCESSFULL, article);
+        } catch (error) {
+            next(error);
         }
+    };
+    getArticleById = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+        try {
+            const { id } = req.params;
+            console.log("article id", id);
+            if (!id || typeof id !== "string") {
+                throw new AppError(HTTP_MESSAGES.VALIDATION_ERROR, 400);
+            }
 
-        const article = await this.articleService.getArticleBySlug(slug);
-
-        res.status(200).json({
-            success: true,
-            data: article,
-        });
+            const article = await this.articleService.getArticleById(id);
+            return ApiResponse.success(res, HTTP_MESSAGES.DATA_FETCH_SUCCESSFULL, article);
+        } catch (error) {
+            next(error);
+        }
     };
 
     getMyArticles = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
         try {
             if (!req.user) {
+                console.log("auth user", req.user);
                 throw new AppError(HTTP_MESSAGES.UNAUTHORIZED, 401);
             }
+
             const page = Number(req.query.page) || 1;
             const limit = Number(req.query.limit) || 10;
+
+            console.log(page, limit);
 
             const { articles, paginationMeta } = await this.articleService.getMyArticles(req.user.userId, page, limit);
 

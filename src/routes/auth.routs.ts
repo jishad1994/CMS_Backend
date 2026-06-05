@@ -5,8 +5,12 @@ import { loginSchema, registerSchema } from "../dtos/auth.dto";
 
 const authRoutes = express.Router();
 
-authRoutes.post(`/login`, validate(loginSchema["body"], ["body"]), authController.login.bind(authController));
+authRoutes.post(`/login`, validate(loginSchema, ["body"]), authController.login.bind(authController));
+
+authRoutes.post(`/logout`, authController.logout.bind(authController));
+
 authRoutes.post(`/register`, validate(registerSchema, ["body"]), authController.register.bind(authController));
-authRoutes.get(`/refresh`, authController.refresh.bind(authController));
+
+authRoutes.post(`/refresh`, authController.refresh.bind(authController));
 
 export default authRoutes;

@@ -66,10 +66,21 @@ export class ArticleService implements IArticleService {
 
         return mapArticleToResponseDto(article);
     }
+    async getArticleById(id: string): Promise<ArticleResponseDto> {
+        const article = await this.articleRepository.findById(id);
+        console.log("article that fetched", article);
+        if (!article ) {
+            throw new AppError(ERROR_MESSAGES.ARTICLE_NOT_FOUND, 404);
+        }
+
+        return mapArticleToResponseDto(article);
+    }
 
     async getMyArticles(authorId: string, page: number, limit: number = 10) {
+        console.log("author id:", authorId);
         const [articles, total] = await this.articleRepository.findByAuthor(authorId, page, limit);
 
+        console.log("artilces:", articles);
         const totalPages = Math.ceil(total / limit);
 
         const paginationMeta: PaginationMeta = {

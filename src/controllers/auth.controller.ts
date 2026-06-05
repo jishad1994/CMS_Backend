@@ -68,4 +68,25 @@ export class AuthController {
             next(error);
         }
     };
+
+    
+    logout = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+         try {
+        const { refreshToken } = req.cookies;
+
+        if (!refreshToken) {
+            throw new AppError(HTTP_MESSAGES.MISSING_TOKEN, 401);
+        }
+
+        await this.authService.logout(refreshToken);
+
+        res.clearCookie(refreshTokenCookieName, refreshTokenCookieOptions);
+        res.clearCookie(accessTokenCookieName, accessTokenCookieOptions);
+
+        return ApiResponse.success(res, HTTP_MESSAGES.LOGOUT_SUCCESSFULL, null);
+    } catch (error) {
+        next(error);
+    }
+    };
+    
 }

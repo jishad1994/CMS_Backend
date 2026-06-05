@@ -22,8 +22,7 @@ export const validate = (schema: ZodSchema, sources: IRequestObjects[]) => (
 ) => {
     try {
         for (const source of sources) {
-            const result = schema.safeParse({ body: req[source] });
-
+            const result = schema.safeParse(req[source]);
             if (!result.success) {
                 logger.error("validation error:", result.error.flatten().fieldErrors);
                 const fieldErrors = result.error.flatten().fieldErrors;
@@ -31,7 +30,6 @@ export const validate = (schema: ZodSchema, sources: IRequestObjects[]) => (
 
                 return next(new AppError(message || "Validation failed", HTTP_STATUS.BAD_REQUEST));
             }
-
             req[source] = result.data;
         }
 

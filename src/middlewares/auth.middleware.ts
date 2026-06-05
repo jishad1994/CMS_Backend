@@ -9,6 +9,7 @@ export function authMiddleware(req: Request, _res: Response, next: NextFunction)
     const result = AuthCookiesSchema.safeParse(req.cookies);
 
     if (!result.success) {
+
         return next(new AppError(HTTP_MESSAGES.MISSING_TOKEN, 401));
     }
 

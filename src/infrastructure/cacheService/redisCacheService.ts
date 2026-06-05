@@ -15,9 +15,10 @@ export class RedisCacheService implements ICacheService {
     async connect(): Promise<void> {
         try {
             await this.client.connect();
+          
             logger.info("redis cache service connected");
         } catch (error) {
-            logger.info("redis connection failed", error);
+            logger.error("redis connection failed", error);
             throw new AppError("redis connection failed", HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
     }

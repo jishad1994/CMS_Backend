@@ -1,6 +1,6 @@
 import cookieParser from "cookie-parser";
 import { env } from "./config/env";
-import { RedisCacheService } from "./infrastructure/cacheService/redisCacheService";
+import { cacheService } from "./dependencies/container.dependencies";
 import { MongoDatabaseConnection } from "./infrastructure/database/mongoDatabaseConnection";
 import express, { Application } from "express";
 import logger from "./utils/logger.util";
@@ -31,7 +31,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 
 const databaseConnection = new MongoDatabaseConnection();
-const cacherService = new RedisCacheService(env.redisUrl);
+
 
 app.use(API_ENDPOINTS.AUTH, authRoutes);
 app.use(API_ENDPOINTS.ARTICLE, articleRoutes);
@@ -41,7 +41,7 @@ app.use(errorMiddleware);
 async function startApp() {
     try {
         await databaseConnection.connect();
-        await cacherService.connect();
+        await cacheService.connect();
 
         app.listen(PORT, () => {
             logger.info(`server started running on port ${PORT}`);

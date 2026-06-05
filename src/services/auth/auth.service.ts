@@ -15,6 +15,7 @@ export class AuthService implements IAuthService {
         const existingUser = await this.userRepository.findByEmail(dto.email);
 
         if (existingUser) {
+            console.log("email already exists");
             throw new AppError(ERROR_MESSAGES.EMAIL_ALREADY_REGISTERED, 409);
         }
 
@@ -166,5 +167,17 @@ export class AuthService implements IAuthService {
                 email: payload.email,
             },
         };
+    }
+
+    async logout(oldRefreshToken: string): Promise<void> {
+        const { sessionId } = verifyRefreshToken(oldRefreshToken);
+
+        const session = await this.cacheService.get(sessionId);
+
+        if (!session) {
+            throw new AppError(HTTP_MESSAGES.INVALID_SESSION_DATA, 401);
+        }
+
+        await this.cacheService.delete(sessionId);
     }
 }

@@ -16,6 +16,8 @@ export interface IArticleService {
 
     getArticleBySlug(slug: string): Promise<ArticleResponseDto>;
 
+    getArticleById(id: string): Promise<ArticleResponseDto>;
+
     getMyArticles(
         authorId: string,
         page: number,
