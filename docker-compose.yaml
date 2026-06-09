@@ -3,7 +3,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    image: jishadkolapurath/contentra-backend:local
+    image: jishadkolapurath/contentra-backend:latest
     # image: jishadkolapurath/contentra-backend:dev
     ports:
       # - "3000:3000"
