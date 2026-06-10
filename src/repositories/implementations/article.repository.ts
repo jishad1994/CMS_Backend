@@ -8,8 +8,14 @@ export class ArticleRepository extends BaseRepository<Article> implements IArtic
         super(model);
     }
 
+     async findById(id: string): Promise<ArticleDocument | null> {
+        return this.model.findById(id).populate("author", "name email").exec();
+    }
+
     async findAllPublished(page: number, limit: number): Promise<[articles: ArticleDocument[], count: number]> {
         const skip = (page - 1) * limit;
+
+
 
         const [articles, count] = await Promise.all([
             this.model
