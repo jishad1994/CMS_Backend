@@ -20,13 +20,18 @@ export const updateArticleSchema = z.object({
     status: z.enum(["draft", "published"]).optional(),
 });
 
-export type CreateArticleDto = z.infer<typeof createArticleSchema>
+export type CreateArticleDto = z.infer<typeof createArticleSchema>;
 
-export type UpdateArticleDto = z.infer<typeof updateArticleSchema>
+export type UpdateArticleDto = z.infer<typeof updateArticleSchema>;
 
 export enum ArticleStatus {
     Draft = "draft",
     Published = "published",
+}
+export interface ArticleAuthorDto {
+    id: string;
+    name: string;
+    email: string;
 }
 export interface DeleteArticleResponseDto {
     message: string;
@@ -40,6 +45,7 @@ export interface ArticleResponseDto {
     content: string;
     status: "draft" | "published";
     authorId: string;
+    author: ArticleAuthorDto;
     createdAt: Date;
     updatedAt: Date;
 }

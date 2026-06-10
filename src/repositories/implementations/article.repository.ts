@@ -38,7 +38,7 @@ export class ArticleRepository extends BaseRepository<Article> implements IArtic
         const skip = (page - 1) * limit;
 
         const [articles, count] = await Promise.all([
-            this.model.find({ author: authorId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+            this.model.find({ author: authorId }).populate("author", "name email").sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
 
             this.model.countDocuments({ author: authorId }).exec(),
         ]);
